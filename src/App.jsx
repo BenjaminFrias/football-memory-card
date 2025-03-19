@@ -1,11 +1,12 @@
-import './App.css'
 import { useState } from 'react';
+import './App.css'
+import Card from './components/Card';
 
 const API_KEY = 'qCKAl9GGC4i2Q96iaXjRyuY1VdksIKy4';
 
 async function getCardsInfo() {
   try {
-    const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=soccer&limit=10&offset=0&rating=g&lang=en&bundle=messaging_non_clips`);
+    const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=barcelona&limit=10&offset=0&rating=g&lang=en&bundle=messaging_non_clips`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`)
@@ -15,7 +16,7 @@ async function getCardsInfo() {
     const images = [];
     data.data.forEach((gifData) => {
       const image = {
-        imageUrl: gifData.embed_url,
+        imageUrl: gifData.images.original.url,
         imageId: gifData.id,
       }
       images.push(image)
@@ -30,6 +31,7 @@ async function getCardsInfo() {
 }
 
 const cardsData = await getCardsInfo();
+
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -46,17 +48,27 @@ function App() {
       </div>
     )
   } else if (currentPage === 'game') {
-    return (<div className='page game'>
-      <div className='info-container'>
-        <div className='scores'>
-          <p className='best-scores'>Best score: <span>0</span></p>
-          <p className='current-scores'>Current score: <span>0</span></p>
+
+    
+    const cards = cardsData.map(card => {      
+      return <Card key={card.imageId} imageUrl={card.imageUrl}/>
+    });
+
+    return (
+      <div className='page game'>
+        <div className='info-container'>
+          <div className='scores'>
+            <p className='best-scores'>Best score: <span>0</span></p>
+            <p className='current-scores'>Current score: <span>0</span></p>
+          </div>
+        </div>
+
+
+        <div className='cards-container'>
+          {cards}
         </div>
       </div>
-
-      <div className='cards-container'>
-      </div>
-    </div>)
+    )
   }
 }
 
