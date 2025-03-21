@@ -13,16 +13,17 @@ async function getCardsInfo() {
     }
 
     const data = await response.json();
-    const images = [];
+    const cardsData = [];
     data.data.forEach((gifData) => {
-      const image = {
+      const card = {
+        id: gifData.id,
         imageUrl: gifData.images.original.url,
-        imageId: gifData.id,
+        hasBeenClicked: false,
       }
-      images.push(image)
+      cardsData.push(card)
     });
-    
-    return images;
+        
+    return cardsData;
     
   }
   catch (error) {
@@ -32,14 +33,35 @@ async function getCardsInfo() {
 
 const cardsData = await getCardsInfo();
 
-
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
 
+  const [cards, setCards] = useState(cardsData)
+
+  // Change found hasBeenCliked property
+  const handleCardClick = (cardId) => { 
+    
+    Object.values(cards).forEach((card, index) => {
+      if (card.id === cardId) {        
+        setCards((prevValues) => (
+          {
+            ...prevValues,
+            [index]: {
+              ...prevValues[index], 
+              ['hasBeenClicked']: true,
+            }
+          }
+        ));
+      }
+    });
+  }
+
+  // TODO: CREATE A FUNCTION THAT SHUFFLES THE ARRAY FROM CARDS AND DISPLAY IT
+  
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
-
+  
   if (currentPage === 'home') {
     return (
       <div className='page home'>
@@ -49,9 +71,8 @@ function App() {
     )
   } else if (currentPage === 'game') {
 
-    
-    const cards = cardsData.map(card => {      
-      return <Card key={card.imageId} imageUrl={card.imageUrl}/>
+    const cardsElements = cardsData.map(card => {      
+      return <Card key={card.id} id={card.id} imageUrl={card.imageUrl} handleCardClick={handleCardClick}/>
     });
 
     return (
@@ -65,7 +86,7 @@ function App() {
 
 
         <div className='cards-container'>
-          {cards}
+          {cardsElements}
         </div>
       </div>
     )

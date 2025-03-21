@@ -1,8 +1,7 @@
-function Card({imageUrl}) {
-    
+function Card({id, imageUrl, handleCardClick}) {
     
     return (
-        <div className="card">
+        <div className="card" onClick={() => handleCardClick(id)}>
             <img src={imageUrl} alt="gif" className="gif"/>
         </div>
     )
