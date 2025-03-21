@@ -41,17 +41,16 @@ function App() {
   // Change found hasBeenCliked property
   const handleCardClick = (cardId) => { 
     
+
     Object.values(cards).forEach((card, index) => {
-      if (card.id === cardId) {        
-        setCards((prevValues) => (
-          {
-            ...prevValues,
-            [index]: {
-              ...prevValues[index], 
-              ['hasBeenClicked']: true,
-            }
+      if (card.id === cardId) {  
+        setCards((prevValues) => {
+            const newCards = prevValues.map(card => ({...card}));
+            newCards[index] = {...newCards[index], hasBeenClicked: true};
+            const shuffledCards = shuffleArray(newCards);
+            return shuffledCards;
           }
-        ));
+        );
       }
     });
   }
@@ -91,6 +90,17 @@ function App() {
       </div>
     )
   }
+}
+
+function shuffleArray(array) {
+  const newArray = [...array];
+
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  
+  return newArray;
 }
 
 export default App
