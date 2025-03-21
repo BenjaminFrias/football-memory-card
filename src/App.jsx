@@ -35,13 +35,10 @@ const cardsData = await getCardsInfo();
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [cards, setCards] = useState(cardsData);
 
-  const [cards, setCards] = useState(cardsData)
-
-  // Change found hasBeenCliked property
+  // Change hasBeenCliked property
   const handleCardClick = (cardId) => { 
-    
-
     Object.values(cards).forEach((card, index) => {
       if (card.id === cardId) {  
         setCards((prevValues) => {
@@ -55,8 +52,6 @@ function App() {
     });
   }
 
-  // TODO: CREATE A FUNCTION THAT SHUFFLES THE ARRAY FROM CARDS AND DISPLAY IT
-  
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
@@ -70,7 +65,7 @@ function App() {
     )
   } else if (currentPage === 'game') {
 
-    const cardsElements = cardsData.map(card => {      
+    const cardsElements = cards.map(card => {      
       return <Card key={card.id} id={card.id} imageUrl={card.imageUrl} handleCardClick={handleCardClick}/>
     });
 
