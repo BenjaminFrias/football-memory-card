@@ -36,18 +36,30 @@ const cardsData = await getCardsInfo();
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [cards, setCards] = useState(cardsData);
+  const [currentScore, setCurrentScore] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
 
   // Change hasBeenCliked property
   const handleCardClick = (cardId) => { 
     Object.values(cards).forEach((card, index) => {
       if (card.id === cardId) {  
-        setCards((prevValues) => {
-            const newCards = prevValues.map(card => ({...card}));
-            newCards[index] = {...newCards[index], hasBeenClicked: true};
-            const shuffledCards = shuffleArray(newCards);
-            return shuffledCards;
+
+        if (card.hasBeenClicked) {
+          if (currentScore > bestScore) {
+            setBestScore(currentScore);
           }
-        );
+
+          setCurrentScore(0);
+        } else {
+          setCurrentScore(currentScore + 1)
+          setCards((prevValues) => {
+              const newCards = prevValues.map(card => ({...card}));
+              newCards[index] = {...newCards[index], hasBeenClicked: true};
+              const shuffledCards = shuffleArray(newCards);
+              return shuffledCards;
+            }
+          );
+        }
       }
     });
   }
@@ -74,7 +86,7 @@ function App() {
         <div className='info-container'>
           <div className='scores'>
             <p className='best-scores'>Best score: <span>0</span></p>
-            <p className='current-scores'>Current score: <span>0</span></p>
+            <p className='current-scores'>Current score: <span>{currentScore}</span></p>
           </div>
         </div>
 
