@@ -11,6 +11,7 @@ function App() {
   const [bestScore, setBestScore] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState('');
+  const [games, setGames] = useState(0);
 
   // TODO: Check for this useEffect hook to call correctly the data and call it again when new game state changes or somth like that
   useEffect(() => {
@@ -56,8 +57,13 @@ function App() {
     }
 
     fetchData();
-  }, []);
+  }, [games]);
 
+  const restartGame = () => {
+    setCurrentPage('home');
+    setCurrentScore(0);
+    setGames(games + 1);
+  }
   
   const checkGameOver = () => {
     if (cards) {
@@ -75,7 +81,6 @@ function App() {
       setBestScore(currentScore);
     }
     setCurrentPage('endgame');
-    setCurrentScore(0);
   }
   
   if (cards) {
@@ -148,7 +153,7 @@ function App() {
         <h2>{result}</h2>
         <p className='best-scores'>Best score: <span>{bestScore}</span></p>
         <p className='current-scores'>Current score: <span>{currentScore}</span></p>
-        <button className="play-again-btn" onClick={() => restartGame()}>Play again</button>
+        <button className="play-again-btn" onClick={restartGame}>Play again</button>
       </div>
     )
   }
