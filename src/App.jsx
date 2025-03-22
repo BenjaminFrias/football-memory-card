@@ -13,41 +13,29 @@ function App() {
   const [result, setResult] = useState('');
   const [games, setGames] = useState(0);
 
-  // TODO: Check for this useEffect hook to call correctly the data and call it again when new game state changes or somth like that
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
 
       try {
-        // const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=barcelona&limit=10&offset=0&rating=g&lang=en&bundle=messaging_non_clips`);
+        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=barcelona&limit=10&offset=0&rating=g&lang=en&bundle=messaging_non_clips`);
     
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! Status: ${response.status}`)
-        // }
-    
-        // const data = await response.json();
-        // const cardsData = [];
-        // data.data.forEach((gifData) => {
-        //   const card = {
-        //     id: gifData.id,
-        //     imageUrl: gifData.images.original.url,
-        //     hasBeenClicked: false,
-        //   }
-        //   cardsData.push(card)
-        // });
-
-        // API MOCKING
-        const apiMockCards = [];
-
-        for (let i = 0; i < 10; i++) {
-          apiMockCards.push({
-            id: i,
-            imageUrl: 'https://cdn.britannica.com/34/212134-050-A7289400/Lionel-Messi-2018.jpg',
-            hasBeenClicked: false,
-          })
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
+    
+        const data = await response.json();
+        const cardsData = [];
+        data.data.forEach((gifData) => {
+          const card = {
+            id: gifData.id,
+            imageUrl: gifData.images.original.url,
+            hasBeenClicked: false,
+          }
+          cardsData.push(card)
+        });
             
-        setCards(apiMockCards);
+        setCards(cardsData);
       }
       catch (error) {
         console.log(error);
@@ -58,7 +46,7 @@ function App() {
 
     fetchData();
   }, [games]);
-
+  
   const restartGame = () => {
     setCurrentPage('home');
     setCurrentScore(0);
@@ -76,6 +64,7 @@ function App() {
   }
   
   const handleEndGame = (resultText) => {
+    restartGame();
     setResult(resultText);
     if (currentScore > bestScore) {
       setBestScore(currentScore);
@@ -98,16 +87,16 @@ function App() {
         } else {
           setCurrentScore(currentScore + 1)
           setCards((prevValues) => {
-              const newCards = prevValues.map(card => ({...card}));
-              newCards[index] = {...newCards[index], hasBeenClicked: true};
-              const shuffledCards = shuffleArray(newCards);
-              return newCards;
-            }
-          );
-        }
+            const newCards = prevValues.map(card => ({...card}));
+            newCards[index] = {...newCards[index], hasBeenClicked: true};
+            const shuffledCards = shuffleArray(newCards);
+            return shuffledCards;
+          }
+        );
       }
-    });
-  }
+    }
+  });
+}
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
