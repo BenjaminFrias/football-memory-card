@@ -1,54 +1,96 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css'
 import Card from './components/Card';
 
 const API_KEY = 'qCKAl9GGC4i2Q96iaXjRyuY1VdksIKy4';
 
-async function getCardsInfo() {
-  try {
-    const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=barcelona&limit=10&offset=0&rating=g&lang=en&bundle=messaging_non_clips`);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`)
-    }
-
-    const data = await response.json();
-    const cardsData = [];
-    data.data.forEach((gifData) => {
-      const card = {
-        id: gifData.id,
-        imageUrl: gifData.images.original.url,
-        hasBeenClicked: false,
-      }
-      cardsData.push(card)
-    });
-        
-    return cardsData;
-    
-  }
-  catch (error) {
-    console.log(error);
-  }
-}
-
-const cardsData = await getCardsInfo();
-
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
-  const [cards, setCards] = useState(cardsData);
+  const [cards, setCards] = useState(null);
   const [currentScore, setCurrentScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState('');
+
+  // TODO: Check for this useEffect hook to call correctly the data and call it again when new game state changes or somth like that
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+
+      try {
+        // const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=barcelona&limit=10&offset=0&rating=g&lang=en&bundle=messaging_non_clips`);
+    
+        // if (!response.ok) {
+        //   throw new Error(`HTTP error! Status: ${response.status}`)
+        // }
+    
+        // const data = await response.json();
+        // const cardsData = [];
+        // data.data.forEach((gifData) => {
+        //   const card = {
+        //     id: gifData.id,
+        //     imageUrl: gifData.images.original.url,
+        //     hasBeenClicked: false,
+        //   }
+        //   cardsData.push(card)
+        // });
+
+        // API MOCKING
+        const apiMockCards = [];
+
+        for (let i = 0; i < 10; i++) {
+          apiMockCards.push({
+            id: i,
+            imageUrl: 'https://cdn.britannica.com/34/212134-050-A7289400/Lionel-Messi-2018.jpg',
+            hasBeenClicked: false,
+          })
+        }
+            
+        setCards(apiMockCards);
+      }
+      catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  
+  if (cards) {
+    let isGameOver = true;
+
+    Object.values(cards).forEach(card => {
+      if (!card.hasBeenClicked) {
+        isGameOver = false;
+      }
+    });
+    
+    if (isGameOver && currentPage !== 'endgame') {
+      setResult('You won!');
+      if (currentScore > bestScore) {
+        setBestScore(currentScore);
+      }
+      setCurrentPage('endgame');
+      setCurrentScore(0);
+    }
+  }
 
   // Change hasBeenCliked property
   const handleCardClick = (cardId) => { 
-    Object.values(cards).forEach((card, index) => {
-      if (card.id === cardId) {  
 
+    Object.values(cards).forEach((card, index) => {
+      // Validate card
+      if (card.id === cardId) {  
         if (card.hasBeenClicked) {
+          setResult('You lost!');
           if (currentScore > bestScore) {
             setBestScore(currentScore);
           }
-
+          
+          setCurrentPage('endgame');
           setCurrentScore(0);
         } else {
           setCurrentScore(currentScore + 1)
@@ -56,7 +98,7 @@ function App() {
               const newCards = prevValues.map(card => ({...card}));
               newCards[index] = {...newCards[index], hasBeenClicked: true};
               const shuffledCards = shuffleArray(newCards);
-              return shuffledCards;
+              return newCards;
             }
           );
         }
@@ -71,21 +113,27 @@ function App() {
   if (currentPage === 'home') {
     return (
       <div className='page home'>
-        <h1>Football memory game!</h1>
+        <h1>Memory card game!</h1>
         <button onClick={() => handlePageChange('game')} className='start-game-btn'>Start game</button>
       </div>
     )
   } else if (currentPage === 'game') {
+    
+    if (isLoading) {
+      return <div className="page loading">
+        <p>Loading...</p>
+      </div>
+    }
 
     const cardsElements = cards.map(card => {      
       return <Card key={card.id} id={card.id} imageUrl={card.imageUrl} handleCardClick={handleCardClick}/>
     });
-
+    
     return (
       <div className='page game'>
         <div className='info-container'>
           <div className='scores'>
-            <p className='best-scores'>Best score: <span>0</span></p>
+            <p className='best-scores'>Best score: <span>{bestScore}</span></p>
             <p className='current-scores'>Current score: <span>{currentScore}</span></p>
           </div>
         </div>
@@ -94,6 +142,15 @@ function App() {
         <div className='cards-container'>
           {cardsElements}
         </div>
+      </div>
+    )
+  } else if (currentPage === 'endgame') {
+    return (
+      <div className="endgame">
+        <h2>{result}</h2>
+        <p className='best-scores'>Best score: <span>{bestScore}</span></p>
+        <p className='current-scores'>Current score: <span>{currentScore}</span></p>
+        <button className="play-again-btn" onClick={() => restartGame()}>Play again</button>
       </div>
     )
   }
