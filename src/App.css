@@ -2,11 +2,14 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 100vw;
-	height: 100vh;
+	height: auto;
 	background: var(--bg-color);
 	padding: 25px;
 	font-family: var(--font-family);
+	background-image: url("./assets/barca.jpg");
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: right;
 }
 
 .page {
@@ -20,7 +23,7 @@ body {
 }
 
 h1 {
-	font-size: 9vw;
+	font-size: 7vw;
 	line-height: normal;
 	color: var(--font-color);
 	font-weight: 600;
@@ -70,4 +73,43 @@ h1 {
 	height: 100%;
 	object-fit: cover;
 	object-position: center;
+}
+
+@media (max-width: 500px) {
+	body {
+		padding: 5px;
+		margin: 0px;
+	}
+
+	.page.game {
+		padding-top: 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.cards-container {
+		justify-content: center;
+		width: 95%;
+	}
+
+	.info-container > div {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.cards-container div.card {
+		width: 120px;
+		height: 150px;
+	}
+}
+
+.scores > p {
+	font-size: 1.5rem;
+	font-weight: 600;
+	background: rgb(228, 30, 30);
+	padding: 10px;
+	border-radius: 15px;
 }

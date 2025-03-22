@@ -105,7 +105,7 @@ function App() {
   if (currentPage === 'home') {
     return (
       <div className='page home'>
-        <h1>Memory card game!</h1>
+        <h1>Football memory card game!</h1>
         <button onClick={() => handlePageChange('game')} className='start-game-btn'>Start game</button>
       </div>
     )
