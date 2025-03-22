@@ -59,39 +59,37 @@ function App() {
   }, []);
 
   
-  if (cards) {
-    let isGameOver = true;
+  const checkGameOver = () => {
+    if (cards) {
+      const isGameOver = !Object.values(cards).some(card => !card.hasBeenClicked)
 
-    Object.values(cards).forEach(card => {
-      if (!card.hasBeenClicked) {
-        isGameOver = false;
+      if (isGameOver && currentPage !== 'endgame') {
+        handleEndGame('You won')
       }
-    });
-    
-    if (isGameOver && currentPage !== 'endgame') {
-      setResult('You won!');
-      if (currentScore > bestScore) {
-        setBestScore(currentScore);
-      }
-      setCurrentPage('endgame');
-      setCurrentScore(0);
     }
+  }
+  
+  const handleEndGame = (resultText) => {
+    setResult(resultText);
+    if (currentScore > bestScore) {
+      setBestScore(currentScore);
+    }
+    setCurrentPage('endgame');
+    setCurrentScore(0);
+  }
+  
+  if (cards) {
+    checkGameOver();
   }
 
   // Change hasBeenCliked property
   const handleCardClick = (cardId) => { 
-
+    
     Object.values(cards).forEach((card, index) => {
       // Validate card
       if (card.id === cardId) {  
         if (card.hasBeenClicked) {
-          setResult('You lost!');
-          if (currentScore > bestScore) {
-            setBestScore(currentScore);
-          }
-          
-          setCurrentPage('endgame');
-          setCurrentScore(0);
+          handleEndGame('You lost!')
         } else {
           setCurrentScore(currentScore + 1)
           setCards((prevValues) => {
